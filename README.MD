@@ -64,7 +64,7 @@ export const getAuthenticator = (env: Record<string, any> | AppLoadContext) => {
         strategy: "jwt",
       },
       debug: env.NODE_ENV === "development",
-      adapter: D1Adapter(env["vsle-keystone"] as D1Database),
+      adapter: D1Adapter(env["your_db_example"] as D1Database),
       providers: [
         Google({
           clientId: env.GOOGLE_CLIENT_ID as string,
