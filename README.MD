@@ -53,7 +53,7 @@ Define a `.server` file (e.g., `services/auth.server.ts`) to set up and access t
 import { RemixAuthenticator } from "remix-authjs";
 import Google from "@auth/core/providers/google";
 import type { AppLoadContext } from "@remix-run/cloudflare";
-import { D1Adapter } from "@auth/adapter-d1";
+import { D1Adapter } from "@auth/adapter-d1"; // Example database
 
 let authenticator: RemixAuthenticator<Record<string, unknown>>;
 
