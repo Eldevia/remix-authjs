@@ -131,12 +131,12 @@ Here’s an example:
 
 ```ts
 import { getAuthenticator } from "~/services/auth.server";
-import type { DataFunctionArgs } from "@remix-run/cloudflare";
+import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { useRef } from "react";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { SignInForm, SignOutForm } from "remix-authjs";
 
-export const loader = async ({ request, context }: DataFunctionArgs) => {
+export const loader = async ({ request, context }: LoaderFunctionArgs) => {
   const authenticator = getAuthenticator(context.env as Record<string, any>);
   const providers = await authenticator.getProviders(request);
   const user = await authenticator.isAuthenticated(request);
