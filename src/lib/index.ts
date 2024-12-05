@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-throw-literal */
 import type {
-  DataFunctionArgs,
+  LoaderFunctionArgs,
+  ActionFunctionArgs,
   AppLoadContext,
 } from "@remix-run/server-runtime";
 import { json, redirect } from "@remix-run/server-runtime";
@@ -11,8 +12,8 @@ import {
   getBody,
   getValue,
   getAuthjsCookieNames,
-} from "remix-authjs/src/utils/utils";
-import type { ProviderID, RemixAuthConfig } from "remix-auth/src/types";
+} from "../utils";
+import type { ProviderID, RemixAuthConfig } from "../types";
 
 type AuthAction =
   | "providers"
@@ -57,10 +58,10 @@ export class RemixAuthenticator<User> {
     providerId,
     params,
   }: {
-    request: Request;
+    request: Request | any;
     action: string;
     providerId?: ProviderID<P> | undefined;
-    params?: DataFunctionArgs["params"];
+    params?: LoaderFunctionArgs["params"] | ActionFunctionArgs["params"];
   }) {
     const url = new URL(request.url);
     const formData = (await getBody(request.clone())) ?? {};
@@ -74,13 +75,19 @@ export class RemixAuthenticator<User> {
     const cookies = parse(request.headers.get("Cookie") ?? "") ?? {};
 
     const authjsCookies = getAuthjsCookieNames(this.options, request);
-    action =
-      action || (getValue("action", url.searchParams, params) as AuthAction);
+    action = action || (getValue("action", url.searchParams, params) as AuthAction);
     providerId = providerId ?? getValue("providerId", url.searchParams, params);
 
-    let csrfToken =
-      cookies[authjsCookies.csrfToken.name] ||
-      getValue("csrfToken", url.searchParams, params);
+    if (!authjsCookies?.csrfToken?.name) {
+      throw new Error("CSRF token cookie configuration is missing");
+    }
+
+    if (!authjsCookies?.callbackUrl?.name) {
+      throw new Error("Callback URL cookie configuration is missing");
+    }
+
+    let csrfToken = cookies[authjsCookies.csrfToken.name] ||
+        getValue("csrfToken", url.searchParams, params);
 
     const blockHtmlReturn = getValue(
       "blockHtmlReturn",
@@ -88,11 +95,10 @@ export class RemixAuthenticator<User> {
       params
     );
 
-    const callbackUrl =
-      getValue("callbackUrl", url.searchParams, params) ??
-      cookies[authjsCookies.callbackUrl.name] ??
-      request.headers.get("Referer") ??
-      url.href.replace(`/${action}`, "").replace(`/${providerId ?? ""}`, "");
+    const callbackUrl = getValue("callbackUrl", url.searchParams, params) ??
+        cookies[authjsCookies.callbackUrl.name] ??
+        request.headers.get("Referer") ??
+        url.href.replace(`/${action}`, "").replace(`/${providerId ?? ""}`, "");
 
     const status = {
       status: 400,
@@ -138,12 +144,19 @@ export class RemixAuthenticator<User> {
         (blockHtmlReturn &&
           authResponse.headers.get("Content-Type") === "text/html")
       ) {
-        return json({
-          action,
-          providerId,
-          callbackUrl,
-          location,
-        });
+        return new Response(
+            JSON.stringify({
+              action,
+              providerId,
+              callbackUrl,
+              location,
+            }),
+            {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            }
+        );
       }
       return authResponse;
     }
@@ -260,12 +273,22 @@ export class RemixAuthenticator<User> {
   getCallbackUrlFromCookie(request: Request): string {
     const authjsCookies = getAuthjsCookieNames(this.options, request);
     const cookies = parse(request.headers.get("Cookie") ?? "") ?? {};
+
+    if (!authjsCookies?.callbackUrl?.name) {
+      throw new Error("Callback URL cookie configuration is missing");
+    }
+
     return cookies[authjsCookies.callbackUrl.name] || "";
   }
 
   getCSRFTokenFromCookie(request: Request): string {
     const authjsCookies = getAuthjsCookieNames(this.options, request);
     const cookies = parse(request.headers.get("Cookie") ?? "") ?? {};
+
+    if (!authjsCookies?.csrfToken?.name) {
+      throw new Error("CSRF token cookie configuration is missing");
+    }
+
     return cookies[authjsCookies.csrfToken.name] || "";
   }
 

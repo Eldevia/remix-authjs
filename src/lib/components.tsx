@@ -1,4 +1,4 @@
-import type { FetcherWithComponents, FormMethod } from "@remix-run/react"
+import type { FormMethod } from "@remix-run/react"
 import {
   type ForwardedRef,
   forwardRef,
@@ -16,7 +16,12 @@ import type {
   BuiltInProviderType,
   RedirectableProviderType,
 } from "@auth/core/providers"
-import { useFetcher } from "@remix-run/react"
+import { useFetcher, type FetcherWithComponents } from "@remix-run/react";
+
+type CSRFResponse = {
+    csrfToken: string | Blob;
+};
+
 
 export function RemixAuthJsFormComp(
   {
@@ -40,8 +45,8 @@ export function RemixAuthJsFormComp(
   const pathname = `${basePath}/${action}${providerId ? `/${providerId}` : ""}`
   const submitting = useRef(false)
   const defaultFetcher = useFetcher()
-  const actionFetcher = fetcher ?? defaultFetcher
-  const csrfToken = csrfFetcher.data?.csrfToken
+  const actionFetcher = fetcher ?? defaultFetcher;
+  const csrfToken = (csrfFetcher.data as CSRFResponse)?.csrfToken;
   useEffect(() => {
     if (
       (method.toLowerCase() !== "post" || csrfToken) &&
@@ -65,12 +70,12 @@ export function RemixAuthJsFormComp(
     <actionFetcher.Form
       ref={(element: any) => {
         if (element) {
-          ;(form as MutableRefObject<HTMLFormElement>).current = element
+          (form as MutableRefObject<HTMLFormElement>).current = element;
         }
         if (typeof ref === "function") {
-          ref(element)
+          ref(element);
         } else if (ref) {
-          ref.current = element
+          ref.current = element;
         }
       }}
       method="get"

@@ -134,7 +134,7 @@ import { getAuthenticator } from "~/services/auth.server";
 import type { DataFunctionArgs } from "@remix-run/cloudflare";
 import { useRef } from "react";
 import { useFetcher, useLoaderData } from "@remix-run/react";
-import { SignInForm, SignOutForm } from "remix-auth/src/lib/components";
+import { SignInForm, SignOutForm } from "remix-authjs";
 
 export const loader = async ({ request, context }: DataFunctionArgs) => {
   const authenticator = getAuthenticator(context.env as Record<string, any>);
