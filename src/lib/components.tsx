@@ -14,26 +14,26 @@ import type {
 import { useFetcher, type FetcherWithComponents } from "@remix-run/react";
 
 type CSRFResponse = {
-    csrfToken: string | Blob;
+    csrfToken: string | Blob | number;
 };
 
-interface SignOutParams<R extends boolean = true> {
+ interface SignOutParams<R extends boolean = true> {
     callbackUrl?: string
     redirect?: R
 }
 
-interface SignInOptions extends Record<string, unknown> {
+ interface SignInOptions extends Record<string, unknown> {
     callbackUrl?: string
     redirect?: boolean
 }
 
-type SignInAuthorizationParams =
+ type SignInAuthorizationParams =
     | string
     | string[][]
     | Record<string, string>
     | URLSearchParams
 
-type LiteralUnion<T extends U, U = string> =
+ type LiteralUnion<T extends U, U = string> =
     | T
     | (U & Record<never, never>);
 
@@ -60,7 +60,7 @@ export function RemixAuthJsFormComp(
   const submitting = useRef(false)
   const defaultFetcher = useFetcher()
   const actionFetcher = fetcher ?? defaultFetcher;
-  const csrfToken = (csrfFetcher.data as CSRFResponse)?.csrfToken;
+  const csrfToken = (csrfFetcher.data  as CSRFResponse)?.csrfToken?.toString();
   useEffect(() => {
     if (
       (method.toLowerCase() !== "post" || csrfToken) &&

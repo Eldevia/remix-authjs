@@ -5,9 +5,7 @@ import type {
   RedirectableProviderType,
 } from "@auth/core/providers";
 
-type LiteralUnion<T extends U, U = string> =
-    | T
-    | (U & Record<never, never>);
+type LiteralUnion<T extends U, U = string> = T | (U & Record<never, never>);
 
 export type ProviderID<P> = LiteralUnion<
   P extends RedirectableProviderType
