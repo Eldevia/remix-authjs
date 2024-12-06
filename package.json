@@ -31,7 +31,6 @@
     "access": "public"
   },
   "dependencies": {
-    "@types/next-auth": "^3.15.0",
     "@auth/core": "^0.37.4",
     "@remix-run/react": "^2.15.0",
     "@remix-run/server-runtime": "^2.15.0",

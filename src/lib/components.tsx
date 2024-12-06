@@ -6,12 +6,7 @@ import {
   useRef,
   type MutableRefObject,
 } from "react"
-import type {
-  LiteralUnion,
-  SignInOptions,
-  SignInAuthorizationParams,
-  SignOutParams,
-} from "next-auth/react"
+
 import type {
   BuiltInProviderType,
   RedirectableProviderType,
@@ -22,6 +17,25 @@ type CSRFResponse = {
     csrfToken: string | Blob;
 };
 
+export interface SignOutParams<R extends boolean = true> {
+    callbackUrl?: string
+    redirect?: R
+}
+
+export interface SignInOptions extends Record<string, unknown> {
+    callbackUrl?: string
+    redirect?: boolean
+}
+
+export type SignInAuthorizationParams =
+    | string
+    | string[][]
+    | Record<string, string>
+    | URLSearchParams
+
+export type LiteralUnion<T extends U, U = string> =
+    | T
+    | (U & Record<never, never>);
 
 export function RemixAuthJsFormComp(
   {
