@@ -1,4 +1,8 @@
-# Auth.js for Remix
+# Auth.js for Remix 
+
+```bash
+npm i remix-authjs
+```
 
 **eldevia/remix-authjs** is a seamless integration of **Auth.js** into **Remix**, making authentication implementation in your Remix applications straightforward and efficient. Forked from https://github.com/acoreyj/next-auth
 
@@ -7,16 +11,6 @@
 - Effortless setup.
 - Supports a wide range of authentication providers.
 - Fully integrates with Remix’s progressive enhancement features.
-
----
-
-## Installation
-
-To install the required packages, use the following command:
-
-```bash
-npm install @auth/core remix-authjs
-```
 
 ---
 
