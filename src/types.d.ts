@@ -5,7 +5,9 @@ import type {
   RedirectableProviderType,
 } from "@auth/core/providers";
 
-import type { LiteralUnion } from "next-auth/react";
+type LiteralUnion<T extends U, U = string> =
+    | T
+    | (U & Record<never, never>);
 
 export type ProviderID<P> = LiteralUnion<
   P extends RedirectableProviderType

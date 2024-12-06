@@ -17,23 +17,23 @@ type CSRFResponse = {
     csrfToken: string | Blob;
 };
 
-export interface SignOutParams<R extends boolean = true> {
+interface SignOutParams<R extends boolean = true> {
     callbackUrl?: string
     redirect?: R
 }
 
-export interface SignInOptions extends Record<string, unknown> {
+interface SignInOptions extends Record<string, unknown> {
     callbackUrl?: string
     redirect?: boolean
 }
 
-export type SignInAuthorizationParams =
+type SignInAuthorizationParams =
     | string
     | string[][]
     | Record<string, string>
     | URLSearchParams
 
-export type LiteralUnion<T extends U, U = string> =
+type LiteralUnion<T extends U, U = string> =
     | T
     | (U & Record<never, never>);
 
