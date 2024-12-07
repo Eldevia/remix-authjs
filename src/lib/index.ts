@@ -12,8 +12,8 @@ import {
   getBody,
   getValue,
   getAuthjsCookieNames,
-} from "../utils";
-import type { ProviderID, RemixAuthConfig } from "../types";
+} from "../utils.js";
+import type { ProviderID, RemixAuthConfig } from "../types.js";
 
 type AuthAction =
   | "providers"
