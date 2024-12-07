@@ -38,16 +38,19 @@ const actions = [
 
 export class RemixAuthenticator<User> {
   private readonly options: RemixAuthConfig;
+  private readonly routePrefix: string;
 
   constructor(
     options: RemixAuthConfig,
-    env: Record<string, string | undefined> | AppLoadContext
-  ) {
+    env: Record<string, string | undefined> | AppLoadContext,
+    routePrefix: string = '/api/auth'
+) {
     this.options = options;
     this.options.secret ??= env.AUTH_SECRET as string | undefined;
     this.options.trustHost ??= !!(
       env.AUTH_TRUST_HOST ?? env.NODE_ENV === "development"
     );
+    this.routePrefix = routePrefix;
   }
 
   async handleAuthRoute<
@@ -168,7 +171,7 @@ export class RemixAuthenticator<User> {
   }
 
   async getSession(req: Request): Promise<{ user?: User } | null> {
-    const url = new URL("/api/auth/session", req.url);
+    const url = new URL(`${this.routePrefix}/session`, req.url);
     const request = new Request(url, { headers: req.headers });
     const response = await Auth(request, this.options);
     const { status = 200 } = response;
@@ -180,7 +183,7 @@ export class RemixAuthenticator<User> {
   }
 
   async getCSRFToken(req: Request): Promise<string | null> {
-    const url = new URL("/api/auth/csrf", req.url);
+    const url = new URL(`${this.routePrefix}/csrf`, req.url);
     const request = new Request(url, { headers: req.headers });
     const response = await Auth(request, this.options);
     const { status = 200 } = response;
@@ -256,7 +259,7 @@ export class RemixAuthenticator<User> {
   }
 
   async getProviders(req: Request): Promise<Record<string, Provider>> {
-    const url = new URL("/api/auth/providers", req.url);
+    const url = new URL(`${this.routePrefix}/providers`, req.url);
     const request = new Request(url, { headers: req.headers });
     const response = await Auth(request, this.options);
     const { status = 200 } = response;
