@@ -1,6 +1,6 @@
-import type { DataFunctionArgs } from "@remix-run/server-runtime"
+import type {ActionFunctionArgs, LoaderFunctionArgs} from "@remix-run/server-runtime"
 import type { RemixAuthConfig } from "./types";
-import type { CookieSerializeOptions } from "cookie";
+import type { SerializeOptions } from 'cookie';
 
 
 export const getBody = async (
@@ -20,7 +20,7 @@ export const getBody = async (
 export const getValue = (
   key: string,
   searchParams: URLSearchParams,
-  params?: DataFunctionArgs["params"]
+  params?: LoaderFunctionArgs["params"] | ActionFunctionArgs["params"]
 ): string | undefined => {
   return searchParams.get(key) ?? params?.[key];
 };
@@ -69,7 +69,7 @@ export function authjsDefaultCookies(useSecureCookies: boolean) {
         sameSite: "lax",
         path: "/",
         secure: useSecureCookies,
-      } satisfies CookieSerializeOptions,
+      } satisfies SerializeOptions,
     },
     pkceCodeVerifier: {
       name: `${cookiePrefix}next-auth.pkce.code_verifier`,

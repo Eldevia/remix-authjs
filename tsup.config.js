@@ -12,4 +12,5 @@ export default defineConfig((options) => ({
   external: ["@remix-run/server-runtime", "@remix-run/react"],
   dts: true,
   bundle: false,
+  outDir: 'dist'
 }));
