@@ -1,4 +1,4 @@
-# Auth.js for Remix 
+# Auth.js for Remix
 
 ```bash
 npm i remix-authjs
@@ -7,6 +7,7 @@ npm i remix-authjs
 **eldevia/remix-authjs** is a seamless integration of **Auth.js** into **Remix**, making authentication implementation in your Remix applications straightforward and efficient. Forked from https://github.com/acoreyj/next-auth
 
 ## Features
+
 - Compatible with Auth.js adapters and providers.
 - Effortless setup.
 - Supports a wide range of authentication providers.
@@ -14,40 +15,46 @@ npm i remix-authjs
 
 ---
 
-## Configuration
-
-### Update `remix.config.js`
-
-In your `remix.config.js`, ensure required dependencies are bundled for proper functionality. Include `@auth/core`, `oauth4webapi`, `preact-render-to-string`, and any providers you intend to use.
-
-Example configuration:
-
-```js
-// remix.config.js
-module.exports = {
-  // Other configuration...
-  serverDependenciesToBundle: [
-    "@auth/core",
-    "oauth4webapi",
-    "preact-render-to-string",
-    "@auth/core/providers/google", // Replace/add providers as needed
-  ],
-};
-```
-
----
-
 ## Usage
 
 ### Step 1: Create an Authenticator Service
 
-Define a `.server` file (e.g., `services/auth.server.ts`) to set up and access the authenticator instance.
+Define a `server` file (e.g., `services/server.ts`) to set up and access the authenticator instance.
 
 ```ts
 import { RemixAuthenticator } from "remix-authjs";
 import Google from "@auth/core/providers/google";
 import type { AppLoadContext } from "@remix-run/cloudflare";
-import { D1Adapter } from "@auth/adapter-d1"; // Example database
+import PostgresAdapter from "@auth/pg-adapter";
+import pg from "pg";
+const { Pool } = pg;
+
+const required = [
+  'DB_HOST',
+  'DB_USERNAME',
+  'DB_PASSWORD',
+  'DB_NAME',
+  'GOOGLE_CLIENT_ID',
+  'GOOGLE_CLIENT_SECRET'
+];
+
+const missing = required.filter(key => !process.env[key]);
+
+if (missing.length > 0) {
+  throw new Error(
+    `Missing required environment variables: ${missing.join(', ')}`
+  );
+}
+
+const pool = new Pool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000
+});
 
 let authenticator: RemixAuthenticator<Record<string, unknown>>;
 
@@ -58,30 +65,30 @@ export const getAuthenticator = (env: Record<string, any> | AppLoadContext) => {
         strategy: "jwt",
       },
       debug: env.NODE_ENV === "development",
-      adapter: D1Adapter(env["your_db_example"] as D1Database),
+      adapter: PostgresAdapter(pool),
       providers: [
         Google({
           clientId: env.GOOGLE_CLIENT_ID as string,
           clientSecret: env.GOOGLE_CLIENT_SECRET as string,
         }) as unknown as any,
       ],
-    }, env);
+    }, env, '/auth');
   }
   return authenticator;
 };
 ```
 
+---
+
 ### Step 2: Create Authentication Routes
 
-Create an optional resource route (e.g., `auth.$action.($providerId).tsx`) for handling authentication actions.
+Create a resource route (e.g., `auth.$action.($providerId).tsx`) for handling authentication actions.
 
 > **Note**: This must be a **Resource Route** to ensure progressive enhancement and CSRF protection.
 
 ```ts
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
-import { getAuthenticator } from "~/services
-
-/auth.server";
+import { getAuthenticator } from "~/services/server";
 
 export const loader: LoaderFunction = async ({ request, params, context }) => {
   const authenticator = getAuthenticator(context.env as Record<string, string>);
@@ -109,22 +116,24 @@ export const action: ActionFunction = async ({ request, params, context }) => {
 ### Step 3: Environment Variables
 
 Set the following environment variables for proper functionality:
+
 1. **`AUTH_SECRET`**: A 32-character random string for security. Generate it using:
    ```bash
    openssl rand -hex 32
    ```
+
 2. **`AUTH_TRUST_HOST`**: Set to `true` for non-Vercel deployments (e.g., Cloudflare Pages, Netlify).
 
 ---
 
 ## Sign In, Sign Out, and User Data
 
-You can use Remix’s progressive enhancement capabilities to create authentication components that work even without JavaScript.
+Use Remix’s progressive enhancement capabilities to create authentication components that work even without JavaScript.
 
-Here’s an example:
+Example:
 
 ```ts
-import { getAuthenticator } from "~/services/auth.server";
+import { getAuthenticator } from "~/services/server";
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { useRef } from "react";
 import { useFetcher, useLoaderData } from "@remix-run/react";
@@ -208,4 +217,3 @@ Set the callback URL for providers to:
 
 For more details, check out the [Remix documentation on Resource Routes](https://remix.run/docs/en/main/guides/resource-routes).
 
----
