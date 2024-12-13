@@ -42,7 +42,7 @@ module.exports = {
 
 ### Step 1: Create an Authenticator Service
 
-Define a `.server` file (e.g., `services/auth.server.ts`) to set up and access the authenticator instance.
+Define a `server` file (e.g., `services/server.ts`) to set up and access the authenticator instance.
 
 ```ts
 import { RemixAuthenticator } from "remix-authjs";
@@ -111,7 +111,7 @@ Create a resource route (e.g., `auth.$action.($providerId).tsx`) for handling au
 
 ```ts
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
-import { getAuthenticator } from "~/services/auth.server";
+import { getAuthenticator } from "~/services/server";
 
 export const loader: LoaderFunction = async ({ request, params, context }) => {
   const authenticator = getAuthenticator(context.env as Record<string, string>);
@@ -156,7 +156,7 @@ Use Remix’s progressive enhancement capabilities to create authentication comp
 Example:
 
 ```ts
-import { getAuthenticator } from "~/services/auth.server";
+import { getAuthenticator } from "~/services/server";
 import type { LoaderFunctionArgs } from "@remix-run/cloudflare";
 import { useRef } from "react";
 import { useFetcher, useLoaderData } from "@remix-run/react";
