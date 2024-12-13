@@ -15,29 +15,6 @@ npm i remix-authjs
 
 ---
 
-## Configuration
-
-### Update `remix.config.js`
-
-In your `remix.config.js`, ensure required dependencies are bundled for proper functionality. Include `@auth/core`, `oauth4webapi`, `preact-render-to-string`, and any providers you intend to use.
-
-Example configuration:
-
-```js
-// remix.config.js
-module.exports = {
-  // Other configuration...
-  serverDependenciesToBundle: [
-    "@auth/core",
-    "oauth4webapi",
-    "preact-render-to-string",
-    "@auth/core/providers/google", // Replace/add providers as needed
-  ],
-};
-```
-
----
-
 ## Usage
 
 ### Step 1: Create an Authenticator Service
